@@ -104,7 +104,7 @@ def update_subscribe
   # json_obj = JSON.parse(ss_config)
   pretty_json_str = JSON.pretty_generate(ss_config)
 
-  pretty_json_str = pretty_json_str.gsub('"#{redir_port}"', config['ss_redir_port'].to_s)
+  pretty_json_str = pretty_json_str.gsub('"#{ss_redir_port}"', config['ss_redir_port'].to_s)
 
   write_config('ss', pretty_json_str)
   puts 'Update configs/ss-config.json .'
