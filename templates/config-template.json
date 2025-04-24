@@ -1,0 +1,6 @@
+{
+  "subscribe": "${subscribe}",
+  "ss_redir_port": 59080,
+  "ss_local_port": 1080,
+  "pf_max_port": 1024
+}

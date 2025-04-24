@@ -1,0 +1,12 @@
+{
+  "locals": [
+    {
+      "local_address": "0.0.0.0",
+      "local_port": "#{ss_redir_port}",
+      "protocol": "redir"
+    }
+  ],
+  "ss_local_port": 1080,
+  "local_address": "127.0.0.1",
+  "servers": "${servers}"
+}
