@@ -168,16 +168,22 @@ def restart
   start
 end
 
+def sslocal
+  IO.popen('sudo sslocal -c configs/ss-config.json 2>&1') do |io|
+    io.each_line { |line| puts line }
+  end
+end
+
 commands = {
   'subscribe' => method(:subscribe),
   'update-cidr' => method(:update_cidr),
   'start' => method(:start),
   'stop' => method(:stop),
-  'restart' => method(:restart)
-
+  'restart' => method(:restart),
+  'sslocal' => method(:sslocal)
 }
 
-OptionParser.new do |opts|
+options = OptionParser.new do |opts|
   opts.banner = 'Manage your tproxy in MacOS.'
   opts.separator ''
   opts.separator 'Usage:'
@@ -186,9 +192,20 @@ OptionParser.new do |opts|
   opts.separator 'Available Commands:'
   opts.separator '  subscribe <link>           Subscribe a proxy link.'
   opts.separator '  start                      Start a Transparent Proxy.'
-  opts.separator '  list                       Stop a transparent Proxy.'
+  opts.separator '  stop                       Stop a transparent Proxy.'
   opts.separator '  update-cidr                Update CIDR.'
-end.parse!
+  opts.separator '  sslocal                    Start sslocal.'
+end
+
+options.parse!
 
 command, *args = ARGV
-commands[command].call(*args) if commands.key?(command)
+# commands[command].call(*args) if commands.key?(command)
+
+# Execute command if it exists, otherwise print help
+if commands.key?(command)
+  commands[command].call(*args)
+else
+  puts options.help # Print the help message
+  exit 1 # Exit with error status to indicate invalid command
+end
