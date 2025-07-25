@@ -1,9 +1,12 @@
+#!/usr/bin/ruby
 # frozen_string_literal: true
 
 require 'base64'
 require 'optparse'
 require 'uri'
 require 'json'
+require 'socket'
+require 'timeout'
 
 def parse_ss_link(ss_link)
   # Remove "ss://" prefix
@@ -174,13 +177,37 @@ def sslocal
   end
 end
 
+def auto
+  while true
+    if not domain_reachable?("google.com")
+      puts "Google is not reachable."
+      restart
+    end
+    sleep 10
+  end
+end
+
+def domain_reachable?(domain, port=80, timeout=5)
+  begin
+    Timeout::timeout(timeout) do
+      socket = TCPSocket.new(domain, port)
+      socket.close
+      return true
+    end
+  rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, SocketError, Timeout::Error
+    return false
+  end
+end
+
+
 commands = {
   'subscribe' => method(:subscribe),
   'update-cidr' => method(:update_cidr),
   'start' => method(:start),
   'stop' => method(:stop),
   'restart' => method(:restart),
-  'sslocal' => method(:sslocal)
+  'sslocal' => method(:sslocal),
+  'auto' => method(:auto)
 }
 
 options = OptionParser.new do |opts|
@@ -193,6 +220,8 @@ options = OptionParser.new do |opts|
   opts.separator '  subscribe <link>           Subscribe a proxy link.'
   opts.separator '  start                      Start a Transparent Proxy.'
   opts.separator '  stop                       Stop a transparent Proxy.'
+  opts.separator '  restart                    Restart a transparent Proxy.'
+  opts.separator '  auto                       Auto restart a transparent Proxy.'
   opts.separator '  update-cidr                Update CIDR.'
   opts.separator '  sslocal                    Start sslocal.'
 end
